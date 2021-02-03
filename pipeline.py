@@ -10,15 +10,15 @@ data_cat = ['train', 'valid'] # data categories
 
 def get_study_level_data(study_type):
     """
-    Returns a dict, with keys 'train' and 'valid' and respective values as study level dataframes, 
+    Returns a dict, with keys 'train' and 'valid' and respective values as study level dataframes,
     these dataframes contain three columns 'Path', 'Count', 'Label'
     Args:
-        study_type (string): one of the seven study type folder names in 'train/valid/test' dataset 
+        study_type (string): one of the seven study type folder names in 'train/valid/test' dataset
     """
     study_data = {}
     study_label = {'positive': 1, 'negative': 0}
     for phase in data_cat:
-        BASE_DIR = 'MURA-v1.0/%s/%s/' % (phase, study_type)
+        BASE_DIR = 'MURA-v1.1/%s/%s/' % (phase, study_type)
         patients = list(os.walk(BASE_DIR))[0][1] # list of patient folder names
         study_data[phase] = pd.DataFrame(columns=['Path', 'Count', 'Label'])
         i = 0
@@ -68,7 +68,7 @@ def get_dataloaders(data, batch_size=8, study_level=False):
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomRotation(10),
                 transforms.ToTensor(),
-                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) 
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
         'valid': transforms.Compose([
             transforms.Resize((224, 224)),
