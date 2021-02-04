@@ -90,8 +90,8 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         labels = data['label'].type(torch.FloatTensor)
         inputs = data['images'][0]
         # wrap them in Variable
-        inputs = Variable(inputs.)
-        labels = Variable(labels.)
+        inputs = Variable(inputs)
+        labels = Variable(labels)
         # forward
         outputs = model(inputs)
         outputs = torch.mean(outputs)
