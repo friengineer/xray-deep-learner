@@ -14,24 +14,24 @@ def plot_training(costs, accs):
     epochs = range(len(train_acc))
 
     plt.figure(figsize=(10, 5))
-    
+
     plt.subplot(1, 2, 1,)
     plt.plot(epochs, train_acc)
     plt.plot(epochs, valid_acc)
     plt.legend(['train', 'valid'], loc='upper left')
     plt.title('Accuracy')
-    
+
     plt.subplot(1, 2, 2)
     plt.plot(epochs, train_cost)
     plt.plot(epochs, valid_cost)
     plt.legend(['train', 'valid'], loc='upper left')
     plt.title('Cost')
-    
+
     plt.show()
 
 def n_p(x):
-    '''convert numpy float to Variable tensor float'''    
-    return Variable(torch.cuda.FloatTensor([x]), requires_grad=False)
+    '''convert numpy float to Variable tensor float'''
+    return Variable(torch.FloatTensor([x]), requires_grad=False)
 
 def get_count(df, cat):
     '''

@@ -7,7 +7,7 @@ from utils import plot_training
 
 data_cat = ['train', 'valid'] # data categories
 
-def train_model(model, criterion, optimizer, dataloaders, scheduler, 
+def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 dataset_sizes, num_epochs):
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -17,7 +17,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
     print('Train batches:', len(dataloaders['train']))
     print('Valid batches:', len(dataloaders['valid']), '\n')
     for epoch in range(num_epochs):
-        confusion_matrix = {x: meter.ConfusionMeter(2, normalized=True) 
+        confusion_matrix = {x: meter.ConfusionMeter(2, normalized=True)
                             for x in data_cat}
         print('Epoch {}/{}'.format(epoch+1, num_epochs))
         print('-' * 10)
@@ -33,8 +33,8 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 inputs = data['images'][0]
                 labels = data['label'].type(torch.FloatTensor)
                 # wrap them in Variable
-                inputs = Variable(inputs.cuda())
-                labels = Variable(labels.cuda())
+                inputs = Variable(inputs)
+                labels = Variable(labels)
                 # zero the parameter gradients
                 optimizer.zero_grad()
                 # forward
@@ -47,7 +47,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                     loss.backward()
                     optimizer.step()
                 # statistics
-                preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
+                preds = (outputs.data > 0.5).type(torch.FloatTensor)
                 running_corrects += torch.sum(preds == labels.data)
                 confusion_matrix[phase].add(preds, labels.data)
             epoch_loss = running_loss / dataset_sizes[phase]
@@ -79,7 +79,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
 def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     '''
-    Loops over phase (train or valid) set to determine acc, loss and 
+    Loops over phase (train or valid) set to determine acc, loss and
     confusion meter of the model.
     '''
     confusion_matrix = meter.ConfusionMeter(2, normalized=True)
@@ -90,15 +90,15 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         labels = data['label'].type(torch.FloatTensor)
         inputs = data['images'][0]
         # wrap them in Variable
-        inputs = Variable(inputs.cuda())
-        labels = Variable(labels.cuda())
+        inputs = Variable(inputs.)
+        labels = Variable(labels.)
         # forward
         outputs = model(inputs)
         outputs = torch.mean(outputs)
         loss = criterion(outputs, labels, phase)
         # statistics
         running_loss += loss.data[0] * inputs.size(0)
-        preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
+        preds = (outputs.data > 0.5).type(torch.FloatTensor)
         running_corrects += torch.sum(preds == labels.data)
         confusion_matrix.add(preds, labels.data)
 
