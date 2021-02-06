@@ -28,8 +28,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             running_corrects = 0
             # Iterate over data.
             for i, data in enumerate(dataloaders[phase]):
-                if i % 100 == 0:
-                    print("Enumerating round", i)
                 # get the inputs
                 print(i, end='\r')
                 inputs = data['images'][0]
@@ -53,8 +51,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = preds.view(1)
                 running_corrects += torch.sum(preds == labels.data)
                 confusion_matrix[phase].add(preds, labels.data)
-                if i % 100 == 0:
-                    print("Finished enumerating round", i)
             epoch_loss = running_loss.item() / dataset_sizes[phase]
             epoch_acc = running_corrects.item() / dataset_sizes[phase]
             costs[phase].append(epoch_loss)
