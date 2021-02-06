@@ -52,5 +52,5 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', pa
 model = train_model(model, criterion, optimizer, dataloaders, scheduler, dataset_sizes, num_epochs=5)
 
 torch.save(model.state_dict(), 'models/model.pth')
-
+print("Saved model")
 get_metrics(model, criterion, dataloaders, dataset_sizes)

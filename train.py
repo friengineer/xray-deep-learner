@@ -61,9 +61,11 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             # deep copy the model
             if phase == 'valid':
                 scheduler.step(epoch_loss)
+                print("Done scheduler at end of train/valid")
                 if epoch_acc > best_acc:
                     best_acc = epoch_acc
                     best_model_wts = copy.deepcopy(model.state_dict())
+        print("About to calculate time elapsed")
         time_elapsed = time.time() - since
         print('Time elapsed: {:.0f}m {:.0f}s'.format(
                 time_elapsed // 60, time_elapsed % 60))
