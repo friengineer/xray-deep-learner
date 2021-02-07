@@ -99,3 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# datasets
+MURA-v1.1
+LERA Dataset

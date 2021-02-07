@@ -9,7 +9,7 @@ from train import train_model, get_metrics
 from pipeline import get_study_level_data, get_dataloaders
 
 # #### load study level dict data
-study_data = get_study_level_data(study_type='XR_WRIST')
+study_data = get_study_level_data(study_type='XR_SHOULDER')
 
 # #### Create dataloaders pipeline
 data_cat = ['train', 'valid'] # data categories
@@ -35,7 +35,7 @@ class Loss(torch.nn.modules.Module):
         super(Loss, self).__init__()
         self.Wt1 = Wt1
         self.Wt0 = Wt0
-        
+
     def forward(self, inputs, targets, phase):
         loss = - (self.Wt1[phase] * targets * inputs.log() + self.Wt0[phase] * (1 - targets) * (1 - inputs).log())
         return loss
@@ -47,9 +47,10 @@ criterion = Loss(Wt1, Wt0)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=1, verbose=True)
 
+# if __name__ == '__main__':
 # #### Train model
 model = train_model(model, criterion, optimizer, dataloaders, scheduler, dataset_sizes, num_epochs=5)
 
-torch.save(model.state_dict(), 'models/model.pth')
+torch.save(model.state_dict(), 'models/model.pt')
 
 get_metrics(model, criterion, dataloaders, dataset_sizes)
