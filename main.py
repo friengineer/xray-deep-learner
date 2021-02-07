@@ -9,7 +9,7 @@ from train import train_model, get_metrics
 from pipeline import get_study_level_data, get_dataloaders
 
 # #### load study level dict data
-study_data = get_study_level_data(study_type='XR_HAND')
+study_data = get_study_level_data(study_type='XR_FOREARM')
 
 # #### Create dataloaders pipeline
 data_cat = ['train', 'valid'] # data categories
