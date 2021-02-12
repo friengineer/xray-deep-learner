@@ -1,0 +1,5 @@
+pytorch torchvision torchaudio cudatoolkit=10.1 -c pytorch
+tqdm -c anaconda
+matplotlib
+ignite -c pytorch
+torchnet
