@@ -4,7 +4,7 @@ import torch
 from torchnet import meter
 from torch.autograd import Variable
 from utils import plot_training
-from ignite.engine import Engine
+# from ignite.engine import Engine
 from ignite.metrics import Precision, Recall
 
 data_cat = ['train', 'valid'] # data categories
@@ -19,7 +19,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
     print('Train batches:', len(dataloaders['train']))
     print('Valid batches:', len(dataloaders['valid']), '\n')
     for epoch in range(num_epochs):
-        confusion_matrix = {x: meter.ConfusionMeter(2, normalized=True)
+        confusion_matrix = {x: meter.ConfusionMeter(2, normalized=False)
                             for x in data_cat}
         print('Epoch {}/{}'.format(epoch+1, num_epochs))
         print('-' * 10)
@@ -29,7 +29,9 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             running_loss = 0.0
             running_corrects = 0
 
-            engine = None
+            # engine = None
+            epoch_precision = Precision(average=False, is_multilabel=False)
+            epoch_recall = Recall(average=False, is_multilabel=False)
 
             # Iterate over data.
             for i, data in enumerate(dataloaders[phase]):
@@ -55,7 +57,9 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
                 preds = preds.view(1)
 
-                engine = Engine((preds, labels))
+                # engine = Engine((preds, labels))
+                epoch_precision.update((preds, labels))
+                epoch_recall.update((preds, labels))
 
                 running_corrects += torch.sum(preds == labels.data)
                 confusion_matrix[phase].add(preds, labels.data)
@@ -64,15 +68,15 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             costs[phase].append(epoch_loss)
             accs[phase].append(epoch_acc)
 
-            epoch_precision = Precision(average=False, is_multilabel=False)
-            epoch_recall = Recall(average=False, is_multilabel=False)
-            epoch_precision.attach(engine, 'precision')
-            epoch_recall.attach(engine, 'recall')
+            # epoch_precision = Precision(average=False, is_multilabel=False)
+            # epoch_recall = Recall(average=False, is_multilabel=False)
+            # epoch_precision.attach(engine, 'precision')
+            # epoch_recall.attach(engine, 'recall')
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
             print('Confusion Meter:\n', confusion_matrix[phase].value())
-            print('\n{} Precision: {:.4f} Recall: {:.4f}'.format(phase, epoch_precision, epoch_recall))
+            print('\n{} Precision: {:.4f} Recall: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute()))
             # deep copy the model
             if phase == 'valid':
                 scheduler.step(epoch_loss)
@@ -98,11 +102,13 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     Loops over phase (train or valid) set to determine acc, loss and
     confusion meter of the model.
     '''
-    confusion_matrix = meter.ConfusionMeter(2, normalized=True)
+    confusion_matrix = meter.ConfusionMeter(2, normalized=False)
     running_loss = 0.0
     running_corrects = 0
 
-    engine = None
+    # engine = None
+    precision = Precision(average=False, is_multilabel=False)
+    recall = Recall(average=False, is_multilabel=False)
 
     for i, data in enumerate(dataloaders[phase]):
         print(i, end='\r')
@@ -120,7 +126,9 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
         preds = preds.view(1)
 
-        engine = Engine((preds, labels))
+        # engine = Engine((preds, labels))
+        precision.update((preds, labels))
+        recall.update((preds, labels))
 
         running_corrects += torch.sum(preds == labels.data)
         confusion_matrix.add(preds, labels.data)
@@ -128,11 +136,11 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     loss = running_loss.item() / dataset_sizes[phase]
     acc = running_corrects.item() / dataset_sizes[phase]
 
-    precision = Precision(average=False, is_multilabel=False)
-    recall = Recall(average=False, is_multilabel=False)
-    precision.attach(engine, 'precision')
-    recall.attach(engine, 'recall')
+    # precision = Precision(average=False, is_multilabel=False)
+    # recall = Recall(average=False, is_multilabel=False)
+    # precision.attach(engine, 'precision')
+    # recall.attach(engine, 'recall')
 
     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, loss, acc))
     print('Confusion Meter:\n', confusion_matrix.value())
-    print('\n{} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision, recall))
+    print('\n{} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision.compute(), recall.compute()))

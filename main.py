@@ -1,3 +1,4 @@
+from sys import argv
 import time
 import copy
 import pandas as pd
@@ -8,8 +9,11 @@ from utils import plot_training, n_p, get_count
 from train import train_model, get_metrics
 from pipeline import get_study_level_data, get_dataloaders
 
+study_type = 'XR_' + argv[1].upper()
+print('Chosen study type:', study_type)
+
 # #### load study level dict data
-study_data = get_study_level_data(study_type='XR_ELBOW')
+study_data = get_study_level_data(study_type=study_type)
 
 # #### Create dataloaders pipeline
 data_cat = ['train', 'valid'] # data categories
