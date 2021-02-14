@@ -22,14 +22,20 @@ Install dependencies:
 * TorchVision
 * Numpy
 * Pandas
+* tqdm
+* Matplotlib
+* PyTorch Ignite
+* torchnet
 
-Train the model with `python main.py`
+The [requirements file](requirements.txt) can be used to install all dependencies.
+
+Train the model with `python main.py {study type}` where {study type} is one of the study types in MURA (e.g. `python main.py wrist`)
 
 ## Citation
     @ARTICLE{2017arXiv171206957R,
-       author = {{Rajpurkar}, P. and {Irvin}, J. and {Bagul}, A. and {Ding}, D. and 
-      {Duan}, T. and {Mehta}, H. and {Yang}, B. and {Zhu}, K. and 
-      {Laird}, D. and {Ball}, R.~L. and {Langlotz}, C. and {Shpanskaya}, K. and 
+       author = {{Rajpurkar}, P. and {Irvin}, J. and {Bagul}, A. and {Ding}, D. and
+      {Duan}, T. and {Mehta}, H. and {Yang}, B. and {Zhu}, K. and
+      {Laird}, D. and {Ball}, R.~L. and {Langlotz}, C. and {Shpanskaya}, K. and
       {Lungren}, M.~P. and {Ng}, A.},
         title = "{MURA Dataset: Towards Radiologist-Level Abnormality Detection in Musculoskeletal Radiographs}",
       journal = {ArXiv e-prints},
