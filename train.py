@@ -1,11 +1,13 @@
 import time
 import copy
+import math
 import torch
 from torchnet import meter
 from torch.autograd import Variable
 from utils import plot_training
 # from ignite.engine import Engine
 from ignite.metrics import Precision, Recall
+from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef
 
 data_cat = ['train', 'valid'] # data categories
 
@@ -33,12 +35,18 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             epoch_precision = Precision(average=False, is_multilabel=False)
             epoch_recall = Recall(average=False, is_multilabel=False)
 
+            overall_labels = []
+            overall_preds = []
+
             # Iterate over data.
             for i, data in enumerate(dataloaders[phase]):
                 # get the inputs
                 print(i, end='\r')
                 inputs = data['images'][0]
                 labels = data['label'].type(torch.FloatTensor)
+
+                overall_labels.append(labels)
+
                 # wrap them in Variable
                 inputs = Variable(inputs.cuda())
                 labels = Variable(labels.cuda())
@@ -57,6 +65,12 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
                 preds = preds.view(1)
 
+                if i%99 == 0:
+                    print('\nLabels:', labels)
+                    print('Preds:', preds)
+
+                overall_preds.append(preds)
+
                 # engine = Engine((preds, labels))
                 epoch_precision.update((preds, labels))
                 epoch_recall.update((preds, labels))
@@ -73,10 +87,18 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             # epoch_precision.attach(engine, 'precision')
             # epoch_recall.attach(engine, 'recall')
 
+            epoch_f1 = (2*epoch_precision*epoch_recall)/(epoch_precision+epoch_recall)
+            # matrix_copy = confusion_matrix[phase].value()
+
+            # mcc = (matrix_copy[1][1]*matrix_copy[0][0])/math.sqrt((matrix_copy[0][1]))
+
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
             print('Confusion Meter:\n', confusion_matrix[phase].value())
-            print('\n{} Precision: {:.4f} Recall: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute()))
+            print('\n{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute(), epoch_f1))
+
+            print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
+
             # deep copy the model
             if phase == 'valid':
                 scheduler.step(epoch_loss)
@@ -110,10 +132,16 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     precision = Precision(average=False, is_multilabel=False)
     recall = Recall(average=False, is_multilabel=False)
 
+    overall_labels = []
+    overall_preds = []
+
     for i, data in enumerate(dataloaders[phase]):
         print(i, end='\r')
         labels = data['label'].type(torch.FloatTensor)
         inputs = data['images'][0]
+
+        overall_labels.append(labels)
+
         # wrap them in Variable
         inputs = Variable(inputs.cuda())
         labels = Variable(labels.cuda())
@@ -125,6 +153,12 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         running_loss += loss.data[0] * inputs.size(0)
         preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
         preds = preds.view(1)
+
+        if i%99 == 0:
+            print('\nLabels:', labels)
+            print('Preds:', preds)
+
+        overall_preds.append(preds)
 
         # engine = Engine((preds, labels))
         precision.update((preds, labels))
@@ -141,6 +175,10 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     # precision.attach(engine, 'precision')
     # recall.attach(engine, 'recall')
 
+    f1 = (2*precision*recall)/(precision+recall)
+
     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, loss, acc))
     print('Confusion Meter:\n', confusion_matrix.value())
-    print('\n{} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision.compute(), recall.compute()))
+    print('\n{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision.compute(), recall.compute(), f1))
+
+    print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))

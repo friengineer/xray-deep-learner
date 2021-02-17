@@ -9,6 +9,7 @@ from utils import plot_training, n_p, get_count
 from train import train_model, get_metrics
 from pipeline import get_study_level_data, get_dataloaders
 
+# get specified study type from command line argument
 study_type = 'XR_' + argv[1].upper()
 print('Chosen study type:', study_type)
 
