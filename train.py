@@ -45,7 +45,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 inputs = data['images'][0]
                 labels = data['label'].type(torch.FloatTensor)
 
-                overall_labels.append(labels)
+                overall_labels.append(labels.item())
 
                 # wrap them in Variable
                 inputs = Variable(inputs.cuda())
@@ -65,11 +65,11 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
                 preds = preds.view(1)
 
+                overall_preds.append(preds.item())
+
                 if i%99 == 0:
                     print('\nOverall labels:', overall_labels)
                     print('Overall preds:', overall_preds)
-
-                overall_preds.append(preds)
 
                 # engine = Engine((preds, labels))
                 epoch_precision.update((preds, labels))
@@ -139,7 +139,7 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         labels = data['label'].type(torch.FloatTensor)
         inputs = data['images'][0]
 
-        overall_labels.append(labels)
+        overall_labels.append(labels.iem())
 
         # wrap them in Variable
         inputs = Variable(inputs.cuda())
@@ -153,11 +153,11 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
         preds = preds.view(1)
 
+        overall_preds.append(preds.item())
+
         if i%99 == 0:
             print('\nOverall labels:', overall_labels)
             print('Overall preds:', overall_preds)
-
-        overall_preds.append(preds)
 
         # engine = Engine((preds, labels))
         precision.update((preds, labels))
