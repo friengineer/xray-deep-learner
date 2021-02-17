@@ -66,8 +66,8 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = preds.view(1)
 
                 if i%99 == 0:
-                    print('\nLabels:', labels)
-                    print('Preds:', preds)
+                    print('\nOverall labels:', overall_labels)
+                    print('Overall preds:', overall_preds)
 
                 overall_preds.append(preds)
 
@@ -87,17 +87,16 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             # epoch_precision.attach(engine, 'precision')
             # epoch_recall.attach(engine, 'recall')
 
-            epoch_f1 = (2*epoch_precision*epoch_recall)/(epoch_precision+epoch_recall)
+            epoch_f1 = (2*epoch_precision.compute()*epoch_recall.compute())/(epoch_precision.compute()+epoch_recall.compute())
             # matrix_copy = confusion_matrix[phase].value()
 
             # mcc = (matrix_copy[1][1]*matrix_copy[0][0])/math.sqrt((matrix_copy[0][1]))
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
+            print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
             print('Confusion Meter:\n', confusion_matrix[phase].value())
             print('\n{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute(), epoch_f1))
-
-            print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
 
             # deep copy the model
             if phase == 'valid':
@@ -155,8 +154,8 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         preds = preds.view(1)
 
         if i%99 == 0:
-            print('\nLabels:', labels)
-            print('Preds:', preds)
+            print('\nOverall labels:', overall_labels)
+            print('Overall preds:', overall_preds)
 
         overall_preds.append(preds)
 
@@ -175,10 +174,9 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     # precision.attach(engine, 'precision')
     # recall.attach(engine, 'recall')
 
-    f1 = (2*precision*recall)/(precision+recall)
+    f1 = (2*precision.compute()*recall.compute())/(precision.compute()+recall.compute())
 
     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, loss, acc))
+    print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
     print('Confusion Meter:\n', confusion_matrix.value())
     print('\n{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision.compute(), recall.compute(), f1))
-
-    print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
