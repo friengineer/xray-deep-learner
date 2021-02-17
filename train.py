@@ -94,9 +94,11 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
-            print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
             print('Confusion Meter:\n', confusion_matrix[phase].value())
             print('\n{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute(), epoch_f1))
+
+            print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
+            print('\nScikit {} F1: {:.4f} MCC: {:.4f}'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
 
             # deep copy the model
             if phase == 'valid':
@@ -139,7 +141,7 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         labels = data['label'].type(torch.FloatTensor)
         inputs = data['images'][0]
 
-        overall_labels.append(labels.iem())
+        overall_labels.append(labels.item())
 
         # wrap them in Variable
         inputs = Variable(inputs.cuda())
@@ -177,6 +179,8 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     f1 = (2*precision.compute()*recall.compute())/(precision.compute()+recall.compute())
 
     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, loss, acc))
-    print('\nScikit {} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds), f1_score(overall_labels, overall_preds)))
     print('Confusion Meter:\n', confusion_matrix.value())
     print('\n{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision.compute(), recall.compute(), f1))
+
+    print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
+    print('\nScikit {} F1: {:.4f} MCC: {:.4f}'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
