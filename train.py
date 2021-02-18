@@ -67,10 +67,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
                 overall_preds.append(preds.item())
 
-                if i%99 == 0:
-                    print('\nOverall labels:', overall_labels)
-                    print('Overall preds:', overall_preds)
-
                 # engine = Engine((preds, labels))
                 epoch_precision.update((preds, labels))
                 epoch_recall.update((preds, labels))
@@ -156,10 +152,6 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         preds = preds.view(1)
 
         overall_preds.append(preds.item())
-
-        if i%99 == 0:
-            print('\nOverall labels:', overall_labels)
-            print('Overall preds:', overall_preds)
 
         # engine = Engine((preds, labels))
         precision.update((preds, labels))
