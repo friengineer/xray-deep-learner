@@ -24,12 +24,14 @@ Install dependencies:
 * Pandas
 * tqdm
 * Matplotlib
+* Scikit-Learn
 * PyTorch Ignite
 * torchnet
 
 The [requirements file](requirements.txt) can be used to install all dependencies.
 
-Train the model with `python main.py {study type}` where {study type} is one of the study types in MURA (e.g. `python main.py wrist`)
+Train the model with `python main.py {study_type}` where {study_type} is either one of the study types in MURA (e.g. `python main.py wrist`) or 'all' to train the model using all the study types.
+Run `python main.py -h` to see the study types that can be specified.
 
 ## Citation
     @ARTICLE{2017arXiv171206957R,

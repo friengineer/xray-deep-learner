@@ -1,4 +1,4 @@
-from sys import argv
+import argparse
 import time
 import copy
 import pandas as pd
@@ -7,14 +7,20 @@ from torch.autograd import Variable
 from densenet import densenet169
 from utils import plot_training, n_p, get_count
 from train import train_model, get_metrics
-from pipeline import get_study_level_data, get_dataloaders
+from pipeline import get_study_level_data, get_all_data, get_dataloaders
 
-# get specified study type from command line argument
-study_type = 'XR_' + argv[1].upper()
-print('Chosen study type:', study_type)
+parser = argparse.ArgumentParser(description='Train a deep learner to determine whether an abnormality exists in an upper extremity x-ray')
+parser.add_argument('study_type', help='study type x-rays to train the model on', choices=['all', 'elbow', 'finger', 'forearm', 'hand', 'humerus', 'shoulder', 'wrist'])
+args = parser.parse_args()
 
-# #### load study level dict data
-study_data = get_study_level_data(study_type=study_type)
+if args.study_type == 'all':
+    print('Training using all study types')
+    # load all dict data
+    study_data = get_all_data()
+else:
+    print('Training using study type', args.study_type)
+    # #### load study level dict data specified in argument
+    study_data = get_study_level_data(study_type='XR_' + args.study_type.upper())
 
 # #### Create dataloaders pipeline
 data_cat = ['train', 'valid'] # data categories

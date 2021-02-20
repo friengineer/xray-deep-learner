@@ -5,7 +5,6 @@ import torch
 from torchnet import meter
 from torch.autograd import Variable
 from utils import plot_training
-# from ignite.engine import Engine
 from ignite.metrics import Precision, Recall
 from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef
 
@@ -31,7 +30,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             running_loss = 0.0
             running_corrects = 0
 
-            # engine = None
             epoch_precision = Precision(average=False, is_multilabel=False)
             epoch_recall = Recall(average=False, is_multilabel=False)
 
@@ -67,7 +65,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
                 overall_preds.append(preds.item())
 
-                # engine = Engine((preds, labels))
                 epoch_precision.update((preds, labels))
                 epoch_recall.update((preds, labels))
 
@@ -78,15 +75,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             costs[phase].append(epoch_loss)
             accs[phase].append(epoch_acc)
 
-            # epoch_precision = Precision(average=False, is_multilabel=False)
-            # epoch_recall = Recall(average=False, is_multilabel=False)
-            # epoch_precision.attach(engine, 'precision')
-            # epoch_recall.attach(engine, 'recall')
-
             epoch_f1 = (2*epoch_precision.compute()*epoch_recall.compute())/(epoch_precision.compute()+epoch_recall.compute())
-            # matrix_copy = confusion_matrix[phase].value()
-
-            # mcc = (matrix_copy[1][1]*matrix_copy[0][0])/math.sqrt((matrix_copy[0][1]))
 
             print('\nConfusion Meter:\n', confusion_matrix[phase].value())
             print('\n{} Loss: {:.4f} Acc: {:.4f}'.format(
@@ -125,7 +114,6 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     running_loss = 0.0
     running_corrects = 0
 
-    # engine = None
     precision = Precision(average=False, is_multilabel=False)
     recall = Recall(average=False, is_multilabel=False)
 
@@ -153,7 +141,6 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
 
         overall_preds.append(preds.item())
 
-        # engine = Engine((preds, labels))
         precision.update((preds, labels))
         recall.update((preds, labels))
 
@@ -162,11 +149,6 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
 
     loss = running_loss.item() / dataset_sizes[phase]
     acc = running_corrects.item() / dataset_sizes[phase]
-
-    # precision = Precision(average=False, is_multilabel=False)
-    # recall = Recall(average=False, is_multilabel=False)
-    # precision.attach(engine, 'precision')
-    # recall.attach(engine, 'recall')
 
     f1 = (2*precision.compute()*recall.compute())/(precision.compute()+recall.compute())
 

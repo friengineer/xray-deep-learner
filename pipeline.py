@@ -30,6 +30,32 @@ def get_study_level_data(study_type):
                 i+=1
     return study_data
 
+def get_all_data():
+    """
+    Returns a dict, with keys 'train' and 'valid' and respective values as dataframes,
+    these dataframes contain three columns 'Path', 'Count', 'Label'
+    """
+    study_type = ['XR_ELBOW', 'XR_FINGER', 'XR_FOREARM', 'XR_HAND', 'XR_HUMERUS', 'XR_SHOULDER', 'XR_WRIST']
+    study_data = {}
+    study_label = {'positive': 1, 'negative': 0}
+
+    for phase in data_cat:
+        study_data[phase] = pd.DataFrame(columns=['Path', 'Count', 'Label'])
+        i = 0
+
+        for body_part in study_type:
+            BASE_DIR = 'MURA-v1.1/%s/%s/' % (phase, body_part)
+            patients = list(os.walk(BASE_DIR))[0][1] # list of patient folder names
+
+            for patient in tqdm(patients): # for each patient folder
+                for study in os.listdir(BASE_DIR + patient): # for each study in that patient folder
+                    label = study_label[study.split('_')[1]] # get label 0 or 1
+                    path = BASE_DIR + patient + '/' + study + '/' # path to this study
+                    study_data[phase].loc[i] = [path, len(os.listdir(path)), label] # add new row
+                    i+=1
+
+    return study_data
+
 class ImageDataset(Dataset):
     """training dataset."""
 
