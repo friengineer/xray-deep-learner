@@ -13,7 +13,8 @@ data_cat = ['train', 'valid'] # data categories
 def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 dataset_sizes, num_epochs):
     global study_info
-    
+    print('Train dictionary:', study_info['train'].loc[0])
+
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0

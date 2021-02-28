@@ -9,6 +9,8 @@ from utils import plot_training, n_p, get_count, study_info
 from train import train_model, get_metrics
 from pipeline import get_study_level_data, get_all_data, get_dataloaders
 
+global study_info
+
 parser = argparse.ArgumentParser(description='Train a deep learner to determine whether an abnormality exists in an upper extremity x-ray')
 parser.add_argument('study_type', help='study type x-rays to train the model on', choices=['all', 'elbow', 'finger', 'forearm', 'hand', 'humerus', 'shoulder', 'wrist'])
 args = parser.parse_args()
@@ -21,6 +23,8 @@ else:
     print('Training using study type', args.study_type)
     # #### load study level dict data specified in argument
     study_info = get_study_level_data(study_type='XR_' + args.study_type.upper())
+
+print('Main dictionary:', study_info['train'].loc[0])
 
 # #### Create dataloaders pipeline
 data_cat = ['train', 'valid'] # data categories
