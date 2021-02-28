@@ -35,6 +35,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
             overall_labels = []
             overall_preds = []
+            misclassified = []
 
             # Iterate over data.
             for i, data in enumerate(dataloaders[phase]):
@@ -63,6 +64,9 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
                 preds = preds.view(1)
 
+                print('Label:', labels.data)
+                print('Predicted:', preds)
+
                 overall_preds.append(preds.item())
 
                 epoch_precision.update((preds, labels))
@@ -70,6 +74,10 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
                 running_corrects += torch.sum(preds == labels.data)
                 confusion_matrix[phase].add(preds, labels.data)
+
+                if preds != labels.data:
+                    misclassified.append(study_data[phase].loc[i][0])
+
             epoch_loss = running_loss.item() / dataset_sizes[phase]
             epoch_acc = running_corrects.item() / dataset_sizes[phase]
             costs[phase].append(epoch_loss)
@@ -84,6 +92,8 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
             print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
             print('Scikit {} F1: {:.4f} MCC: {:.4f}\n'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
+
+            print('Misclassified:', misclassified)
 
             # deep copy the model
             if phase == 'valid':
