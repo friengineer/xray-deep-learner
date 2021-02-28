@@ -3,6 +3,8 @@ from torch.autograd import Variable
 import matplotlib.pyplot as plt
 from torchnet import meter
 
+study_info = {}
+
 def plot_training(costs, accs):
     '''
     Plots curve of Cost vs epochs and Accuracy vs epochs for 'train' and 'valid' sets during training

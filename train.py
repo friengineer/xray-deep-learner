@@ -4,7 +4,7 @@ import math
 import torch
 from torchnet import meter
 from torch.autograd import Variable
-from utils import plot_training
+from utils import plot_training, study_info
 from ignite.metrics import Precision, Recall
 from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef
 
@@ -64,9 +64,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 preds = (outputs.data > 0.5).type(torch.cuda.FloatTensor)
                 preds = preds.view(1)
 
-                print('\nLabel:', labels.data)
-                print('Predicted:', preds)
-
                 overall_preds.append(preds.item())
 
                 epoch_precision.update((preds, labels))
@@ -76,7 +73,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 confusion_matrix[phase].add(preds, labels.data)
 
                 if preds != labels.data:
-                    misclassified.append(data)
+                    misclassified.append(utils.study_info[phase].loc[i])
 
             epoch_loss = running_loss.item() / dataset_sizes[phase]
             epoch_acc = running_corrects.item() / dataset_sizes[phase]
