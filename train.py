@@ -12,6 +12,8 @@ data_cat = ['train', 'valid'] # data categories
 
 def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 dataset_sizes, num_epochs):
+    global study_info
+    
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -73,7 +75,7 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 confusion_matrix[phase].add(preds, labels.data)
 
                 if preds != labels.data:
-                    misclassified.append(utils.study_info[phase].loc[i])
+                    misclassified.append(study_info[phase].loc[i])
 
             epoch_loss = running_loss.item() / dataset_sizes[phase]
             epoch_acc = running_corrects.item() / dataset_sizes[phase]
