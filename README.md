@@ -30,7 +30,7 @@ Install dependencies:
 
 The [requirements file](requirements.txt) can be used to install all dependencies.
 
-Train the model with `python main.py {study_type}` where {study_type} is either one of the study types in MURA (e.g. `python main.py wrist`) or 'all' to train the model using all the study types.
+Train the model with `python main.py {study_type}` where {study_type} is either one of the study types in MURA or LERA (e.g. `python main.py wrist`), 'mura' to train the model using all the MURA study types or 'lera' to train the model using all the LERA study types.
 Run `python main.py -h` to see the study types that can be specified.
 
 ## Citation

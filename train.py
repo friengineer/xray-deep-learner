@@ -4,7 +4,7 @@ import math
 import torch
 from torchnet import meter
 from torch.autograd import Variable
-from utils import plot_training, study_info
+from utils import plot_training
 from ignite.metrics import Precision, Recall
 from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef
 
@@ -12,9 +12,6 @@ data_cat = ['train', 'valid'] # data categories
 
 def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 dataset_sizes, num_epochs):
-    global study_info
-    print('Train dictionary:', study_info['train'].loc[0])
-
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -38,7 +35,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
             overall_labels = []
             overall_preds = []
-            misclassified = []
 
             # Iterate over data.
             for i, data in enumerate(dataloaders[phase]):
@@ -75,9 +71,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 running_corrects += torch.sum(preds == labels.data)
                 confusion_matrix[phase].add(preds, labels.data)
 
-                if preds != labels.data:
-                    misclassified.append(study_info[phase].loc[i])
-
             epoch_loss = running_loss.item() / dataset_sizes[phase]
             epoch_acc = running_corrects.item() / dataset_sizes[phase]
             costs[phase].append(epoch_loss)
@@ -92,8 +85,6 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
             print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
             print('Scikit {} F1: {:.4f} MCC: {:.4f}\n'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
-
-            print('Misclassified:', misclassified)
 
             # deep copy the model
             if phase == 'valid':

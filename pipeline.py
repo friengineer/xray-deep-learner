@@ -6,6 +6,9 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets.folder import pil_loader
 
+# dataset studies
+mura_studies = ['XR_ELBOW', 'XR_FINGER', 'XR_FOREARM', 'XR_HAND', 'XR_HUMERUS', 'XR_SHOULDER', 'XR_WRIST']
+lera_studies = ['XR_ANKLE', 'XR_FOOT', 'XR_HIP', 'XR_KNEE']
 data_cat = ['train', 'valid'] # data categories
 
 def get_study_level_data(study_type):
@@ -17,8 +20,14 @@ def get_study_level_data(study_type):
     """
     study_data = {}
     study_label = {'positive': 1, 'negative': 0}
+
+    if study_type in mura_studies:
+        dataset = 'MURA-v1.1'
+    else:
+        dataset = 'LERA'
+        
     for phase in data_cat:
-        BASE_DIR = 'MURA-v1.1/%s/%s/' % (phase, study_type)
+        BASE_DIR = '%s/%s/%s/' % (dataset, phase, study_type)
         patients = list(os.walk(BASE_DIR))[0][1] # list of patient folder names
         study_data[phase] = pd.DataFrame(columns=['Path', 'Count', 'Label'])
         i = 0
@@ -30,21 +39,25 @@ def get_study_level_data(study_type):
                 i+=1
     return study_data
 
-def get_all_data():
+def get_all_data(dataset):
     """
     Returns a dict, with keys 'train' and 'valid' and respective values as dataframes,
     these dataframes contain three columns 'Path', 'Count', 'Label'
     """
-    study_type = ['XR_ELBOW', 'XR_FINGER', 'XR_FOREARM', 'XR_HAND', 'XR_HUMERUS', 'XR_SHOULDER', 'XR_WRIST']
     study_data = {}
     study_label = {'positive': 1, 'negative': 0}
+
+    if dataset == 'MURA-v1.1':
+        study_types = mura_studies
+    else:
+        study_types = lera_studies
 
     for phase in data_cat:
         study_data[phase] = pd.DataFrame(columns=['Path', 'Count', 'Label'])
         i = 0
 
-        for body_part in study_type:
-            BASE_DIR = 'MURA-v1.1/%s/%s/' % (phase, body_part)
+        for body_part in study_types:
+            BASE_DIR = '%s/%s/%s/' % (dataset, phase, body_part)
             patients = list(os.walk(BASE_DIR))[0][1] # list of patient folder names
 
             for patient in tqdm(patients): # for each patient folder

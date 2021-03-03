@@ -5,36 +5,37 @@ import pandas as pd
 import torch
 from torch.autograd import Variable
 from densenet import densenet169
-from utils import plot_training, n_p, get_count, study_info
+from utils import plot_training, n_p, get_count
 from train import train_model, get_metrics
 from pipeline import get_study_level_data, get_all_data, get_dataloaders
 
-global study_info
-
-parser = argparse.ArgumentParser(description='Train a deep learner to determine whether an abnormality exists in an upper extremity x-ray')
-parser.add_argument('study_type', help='study type x-rays to train the model on', choices=['all', 'elbow', 'finger', 'forearm', 'hand', 'humerus', 'shoulder', 'wrist'])
+parser = argparse.ArgumentParser(description='Train a deep learner to determine whether an abnormality exists in an upper or lower extremity x-ray')
+parser.add_argument('study_type', help='study type x-rays to train the model on',
+                    choices=['mura', 'lera', 'elbow', 'finger', 'forearm', 'hand', 'humerus', 'shoulder', 'wrist', 'ankle', 'foot', 'hip', 'knee'])
 args = parser.parse_args()
 
-if args.study_type == 'all':
-    print('Training using all study types')
-    # load all dict data
-    study_info = get_all_data()
+if args.study_type == 'mura':
+    print('Training using all MURA study types')
+    # load all MURA dict data
+    study_data = get_all_data(dataset='MURA-v1.1')
+elif args.study_type == 'lera':
+    print('Training using all LERA study types')
+    # load all LERA dict data
+    study_data = get_all_data(dataset='LERA')
 else:
     print('Training using study type', args.study_type)
     # #### load study level dict data specified in argument
-    study_info = get_study_level_data(study_type='XR_' + args.study_type.upper())
-
-print('Main dictionary:', study_info['train'].loc[0])
+    study_data = get_study_level_data(study_type='XR_' + args.study_type.upper())
 
 # #### Create dataloaders pipeline
 data_cat = ['train', 'valid'] # data categories
-dataloaders = get_dataloaders(study_info, batch_size=1)
-dataset_sizes = {x: len(study_info[x]) for x in data_cat}
+dataloaders = get_dataloaders(study_data, batch_size=1)
+dataset_sizes = {x: len(study_data[x]) for x in data_cat}
 
 # #### Build model
 # tai = total abnormal images, tni = total normal images
-tai = {x: get_count(study_info[x], 'positive') for x in data_cat}
-tni = {x: get_count(study_info[x], 'negative') for x in data_cat}
+tai = {x: get_count(study_data[x], 'positive') for x in data_cat}
+tni = {x: get_count(study_data[x], 'negative') for x in data_cat}
 Wt1 = {x: n_p(tni[x] / (tni[x] + tai[x])) for x in data_cat}
 Wt0 = {x: n_p(tai[x] / (tni[x] + tai[x])) for x in data_cat}
 
