@@ -5,7 +5,7 @@ import torch
 from torchnet import meter
 from torch.autograd import Variable
 from utils import plot_training
-from ignite.metrics import Precision, Recall
+# from ignite.metrics import Precision, Recall
 from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef
 
 data_cat = ['train', 'valid'] # data categories
@@ -30,8 +30,8 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             running_loss = 0.0
             running_corrects = 0
 
-            epoch_precision = Precision(average=False, is_multilabel=False)
-            epoch_recall = Recall(average=False, is_multilabel=False)
+            # epoch_precision = Precision(average=False, is_multilabel=False)
+            # epoch_recall = Recall(average=False, is_multilabel=False)
 
             overall_labels = []
             overall_preds = []
@@ -65,8 +65,8 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
 
                 overall_preds.append(preds.item())
 
-                epoch_precision.update((preds, labels))
-                epoch_recall.update((preds, labels))
+                # epoch_precision.update((preds, labels))
+                # epoch_recall.update((preds, labels))
 
                 running_corrects += torch.sum(preds == labels.data)
                 confusion_matrix[phase].add(preds, labels.data)
@@ -76,12 +76,12 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             costs[phase].append(epoch_loss)
             accs[phase].append(epoch_acc)
 
-            epoch_f1 = (2*epoch_precision.compute()*epoch_recall.compute())/(epoch_precision.compute()+epoch_recall.compute())
+            # epoch_f1 = (2*epoch_precision.compute()*epoch_recall.compute())/(epoch_precision.compute()+epoch_recall.compute())
 
             print('\nConfusion Meter:\n', confusion_matrix[phase].value())
             print('\n{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
-            print('{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute(), epoch_f1))
+            # print('{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute(), epoch_f1))
 
             print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
             print('Scikit {} F1: {:.4f} MCC: {:.4f}\n'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
@@ -115,8 +115,8 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     running_loss = 0.0
     running_corrects = 0
 
-    precision = Precision(average=False, is_multilabel=False)
-    recall = Recall(average=False, is_multilabel=False)
+    # precision = Precision(average=False, is_multilabel=False)
+    # recall = Recall(average=False, is_multilabel=False)
 
     overall_labels = []
     overall_preds = []
@@ -142,8 +142,8 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
 
         overall_preds.append(preds.item())
 
-        precision.update((preds, labels))
-        recall.update((preds, labels))
+        # precision.update((preds, labels))
+        # recall.update((preds, labels))
 
         running_corrects += torch.sum(preds == labels.data)
         confusion_matrix.add(preds, labels.data)
@@ -151,11 +151,11 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     loss = running_loss.item() / dataset_sizes[phase]
     acc = running_corrects.item() / dataset_sizes[phase]
 
-    f1 = (2*precision.compute()*recall.compute())/(precision.compute()+recall.compute())
+    # f1 = (2*precision.compute()*recall.compute())/(precision.compute()+recall.compute())
 
     print('\nConfusion Meter:\n', confusion_matrix.value())
     print('\n{} Loss: {:.4f} Acc: {:.4f}'.format(phase, loss, acc))
-    print('{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision.compute(), recall.compute(), f1))
+    # print('{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision.compute(), recall.compute(), f1))
 
     print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
     print('Scikit {} F1: {:.4f} MCC: {:.4f}\n'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
