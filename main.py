@@ -1,8 +1,5 @@
-import argparse
-import time
-import copy
+import argparse, time, copy, torch
 import pandas as pd
-import torch
 from torch.autograd import Variable
 from densenet import densenet169
 from utils import plot_training, n_p, get_count
@@ -12,6 +9,7 @@ from pipeline import get_study_level_data, get_all_data, get_dataloaders
 parser = argparse.ArgumentParser(description='Train a deep learner to determine whether an abnormality exists in an upper or lower extremity x-ray')
 parser.add_argument('study_type', help='study type x-rays to train the model on',
                     choices=['mura', 'lera', 'elbow', 'finger', 'forearm', 'hand', 'humerus', 'shoulder', 'wrist', 'ankle', 'foot', 'hip', 'knee'])
+parser.add_argument('-t', '--transfer', help='use transfer learning using saved model', type=str)
 args = parser.parse_args()
 
 if args.study_type == 'mura':
@@ -56,7 +54,12 @@ class Loss(torch.nn.modules.Module):
         loss = - (self.Wt1[phase] * targets * inputs.log() + self.Wt0[phase] * (1 - targets) * (1 - inputs).log())
         return loss
 
-model = densenet169(pretrained=True)
+if args.transfer:
+    model = densenet169()
+    model.load_state_dict(torch.load('models/' + args.transfer), strict=False)
+else:
+    model = densenet169(pretrained=True)
+
 model = model.cuda()
 
 criterion = Loss(Wt1, Wt0)
