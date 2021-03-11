@@ -30,8 +30,9 @@ Install dependencies:
 
 The [requirements file](requirements.txt) can be used to install all dependencies.
 
-Train the model with `python main.py {study_type}` where {study_type} is either one of the study types in MURA (e.g. `python main.py wrist`) or 'all' to train the model using all the study types.
-Run `python main.py -h` to see the study types that can be specified.
+Train the model with `python main.py {study_type}` where {study_type} is either one of the study types in MURA or LERA (e.g. `python main.py wrist`), 'mura' to train the model using all the MURA study types or 'lera' to train the model using all the LERA study types. Run `python main.py -h` to see the study types that can be specified.
+
+Transfer learning can be used to warmstart the model by loading a previously saved model's parameters using the argument `-t {file}` where {file} is the filename of the model saved in the models directory (e.g. `python main.py wrist -t model.pt`).
 
 ## Citation
     @ARTICLE{2017arXiv171206957R,
