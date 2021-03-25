@@ -56,6 +56,7 @@ if args.study_type == 'lera' or args.study_type in lera_options:
 
     for fold, (train_index, valid_index) in enumerate(skf.split(list(all_data.index), list(all_data.Label))):
         print('Fold', fold)
+        print('*******************************************')
 
         temp_data = {}
         temp_data['train'] = pd.DataFrame(columns=['Path', 'Count', 'Label'])
