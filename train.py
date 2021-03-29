@@ -43,6 +43,12 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 inputs = data['images'][0]
                 labels = data['label'].type(torch.FloatTensor)
 
+                # if study_level:
+                #     inputs = data['images'][0]
+                # else:
+                #     inputs = data['image']
+                #     labels = labels.view(-1, 1)
+
                 overall_labels.append(labels.item())
 
                 # wrap them in Variable
@@ -52,6 +58,15 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
                 optimizer.zero_grad()
                 # forward
                 outputs = model(inputs)
+
+                # if study_level:
+                #     outputs = torch.mean(outputs)
+                #     loss = criterion(outputs, labels, phase)
+                #     running_loss += loss.data[0]
+                # else:
+                #     loss = criterion(outputs, labels)
+                #     running_loss += loss.data[0] * inputs.size(0)
+
                 outputs = torch.mean(outputs)
                 loss = criterion(outputs, labels, phase)
                 running_loss += loss.data[0]
@@ -124,6 +139,13 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     for i, data in enumerate(dataloaders[phase]):
         print(i, end='\r')
         labels = data['label'].type(torch.FloatTensor)
+
+        # if study_level:
+        #     inputs = data['images'][0]
+        # else:
+        #     inputs = data['image']
+        #     labels = labels.view(-1, 1)
+
         inputs = data['images'][0]
 
         overall_labels.append(labels.item())
@@ -133,6 +155,13 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
         labels = Variable(labels.cuda())
         # forward
         outputs = model(inputs)
+
+        # if study_level:
+        #     outputs = torch.mean(outputs)
+        #     loss = criterion(outputs, labels, phase)
+        # else:
+        #     loss = criterion(outputs, labels)
+
         outputs = torch.mean(outputs)
         loss = criterion(outputs, labels, phase)
         # statistics
