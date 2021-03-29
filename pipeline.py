@@ -25,7 +25,7 @@ def get_study_level_data(study_type):
         dataset = 'MURA-v1.1'
     else:
         dataset = 'LERA'
-        
+
     for phase in data_cat:
         BASE_DIR = '%s/%s/%s/' % (dataset, phase, study_type)
         patients = list(os.walk(BASE_DIR))[0][1] # list of patient folder names
@@ -95,6 +95,25 @@ class ImageDataset(Dataset):
         images = torch.stack(images)
         label = self.df.iloc[idx, 2]
         sample = {'images': images, 'label': label}
+
+        # if self.study_level:
+        #     study_path = self.df.iloc[idx, 0]
+        #     count = self.df.iloc[idx, 1]
+        #     images = []
+        #     for i in range(count):
+        #         image = pil_loader(study_path + 'image%s.png' % (i+1))
+        #         images.append(self.transform(image))
+        #     images = torch.stack(images)
+        #     label = self.df.iloc[idx, 2]
+        #     sample = {'images': images, 'label': label}
+        # else:
+        #     img_path = self.df.iloc[idx, 0]
+        #     image = pil_loader(img_path)
+        #     label = self.df.iloc[idx, 1]
+        #     if self.transform:
+        #         image = self.transform(image)
+        #     sample = {'image': image, 'label': label}
+
         return sample
 
 def get_dataloaders(data, batch_size=8, study_level=False):
