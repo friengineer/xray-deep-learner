@@ -6,7 +6,7 @@ from torchnet import meter
 from torch.autograd import Variable
 from utils import plot_training
 # from ignite.metrics import Precision, Recall
-from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef
+from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef, roc_auc_score
 
 data_cat = ['train', 'valid'] # data categories
 
@@ -99,7 +99,8 @@ def train_model(model, criterion, optimizer, dataloaders, scheduler,
             # print('{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, epoch_precision.compute(), epoch_recall.compute(), epoch_f1))
 
             print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
-            print('Scikit {} F1: {:.4f} MCC: {:.4f}\n'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
+            print('Scikit {} F1: {:.4f} MCC: {:.4f}'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
+            print('Scikit {} AUROC: {:.4f}\n'.format(phase, roc_auc_score(overall_labels, overall_preds)))
 
             # deep copy the model
             if phase == 'valid':
@@ -187,4 +188,5 @@ def get_metrics(model, criterion, dataloaders, dataset_sizes, phase='valid'):
     # print('{} Precision: {:.4f} Recall: {:.4f} F1: {:.4f}'.format(phase, precision.compute(), recall.compute(), f1))
 
     print('\nScikit {} Precision: {:.4f} Recall: {:.4f}'.format(phase, precision_score(overall_labels, overall_preds), recall_score(overall_labels, overall_preds)))
-    print('Scikit {} F1: {:.4f} MCC: {:.4f}\n'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
+    print('Scikit {} F1: {:.4f} MCC: {:.4f}'.format(phase, f1_score(overall_labels, overall_preds), matthews_corrcoef(overall_labels, overall_preds)))
+    print('Scikit {} AUROC: {:.4f}\n'.format(phase, roc_auc_score(overall_labels, overall_preds)))
