@@ -21,7 +21,7 @@ class Loss(torch.nn.modules.Module):
 parser = argparse.ArgumentParser(description='Train a deep learner to determine whether an abnormality exists in an upper or lower extremity x-ray')
 parser.add_argument('study_type', help='study type x-rays to train the model on',
                     choices=['mura', 'lera', 'elbow', 'finger', 'forearm', 'hand', 'humerus', 'shoulder', 'wrist', 'ankle', 'foot', 'hip', 'knee'])
-parser.add_argument('-t', '--transfer', help='use transfer learning using saved model', type=str)
+parser.add_argument('-t', '--transfer', help="use transfer learning specifying saved model's filename", type=str)
 args = parser.parse_args()
 
 if args.study_type == 'mura':
@@ -44,7 +44,7 @@ lera_options = ['ankle', 'foot', 'hip', 'knee']
 if args.study_type == 'lera' or args.study_type in lera_options:
     # print(dataloaders['train']['images'][0])
     # print(list(study_data['train'].Path.values))
-    skf = StratifiedKFold(shuffle=True)
+    skf = StratifiedKFold()
     # print(skf.split(dataloaders))
     # print(skf.split(study_data['train']['Path'], study_data['train']['Label']))
 
@@ -90,6 +90,10 @@ if args.study_type == 'lera' or args.study_type in lera_options:
         if args.transfer:
             model = densenet169()
             model.load_state_dict(torch.load('models/' + args.transfer), strict=False)
+
+            # for param in model.parameters():
+            #     param.requires_grad = False
+            # sys.exit()
         else:
             model = densenet169(pretrained=True)
 
