@@ -5,7 +5,7 @@ from torchnet import meter
 
 def plot_training(costs, accs):
     '''
-    Plots curve of Cost vs epochs and Accuracy vs epochs for 'train' and 'valid' sets during training
+    Plots curve of Cost vs epochs and Accuracy vs epochs for 'train' and 'valid' sets during training.
     '''
     train_acc = accs['train']
     valid_acc = accs['valid']
@@ -29,13 +29,16 @@ def plot_training(costs, accs):
 
     plt.savefig('graph.png')
 
+
 def n_p(x):
-    '''convert numpy float to Variable tensor float'''
+    '''Convert numpy float to Variable tensor float.'''
     return Variable(torch.cuda.FloatTensor([x]), requires_grad=False)
+
 
 def get_count(df, cat):
     '''
-    Returns number of images in a study type dataframe which are of abnormal or normal
+    Returns number of images in a study type dataframe which are abnormal or normal.
+
     Args:
     df -- dataframe
     cat -- category, "positive" for abnormal and "negative" for normal
